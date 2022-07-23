@@ -1,35 +1,64 @@
 package routers
 
 import (
+	"html/template"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/wannanbigpig/gin-layout/assets"
 	"github.com/wannanbigpig/gin-layout/config"
 	"github.com/wannanbigpig/gin-layout/internal/middleware"
 	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
 	response2 "github.com/wannanbigpig/gin-layout/internal/pkg/response"
-	"io/ioutil"
-	"net/http"
 )
 
 func SetRouters() *gin.Engine {
-	var r *gin.Engine
+	r := gin.New()
+	r.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
+	r.StaticFS("assets", http.FS(assets.Static))
+	fav := func(c *gin.Context) {
+		if c.Request.RequestURI != "/favicon.ico" {
+			return
+		}
+		if c.Request.Method != "GET" && c.Request.Method != "HEAD" {
+			status := http.StatusOK
+			if c.Request.Method != "OPTIONS" {
+				status = http.StatusMethodNotAllowed
+			}
+			c.Header("Allow", "GET,HEAD,OPTIONS")
+			c.AbortWithStatus(status)
+			return
+		}
+
+		c.Header("Content-Type", "image/x-icon")
+		data, err := assets.Static.ReadFile("static/favicon.ico")
+		if err == nil {
+			c.Writer.Write(data)
+		}
+
+	}
+	// 初始化默认静态资源
+	r.Use(fav)
+
+	// 设置模板资源
+
+	r.Use(
+		middleware.RequestCostHandler(),
+		middleware.CustomRecovery(),
+		middleware.CorsHandler(),
+	)
 
 	if config.Config.Debug == false {
 		// 生产模式
-		r = ReleaseRouter()
+		ReleaseRouter()
 		r.Use(
-			middleware.RequestCostHandler(),
 			middleware.CustomLogger(),
-			middleware.CustomRecovery(),
-			middleware.CorsHandler(),
 		)
 	} else {
 		// 开发调试模式
-		r = gin.New()
 		r.Use(
-			middleware.RequestCostHandler(),
 			gin.Logger(),
-			middleware.CustomRecovery(),
-			middleware.CorsHandler(),
 		)
 	}
 
@@ -51,13 +80,10 @@ func SetRouters() *gin.Engine {
 }
 
 // ReleaseRouter 生产模式使用官方建议设置为 release 模式
-func ReleaseRouter() *gin.Engine {
+func ReleaseRouter() {
 	// 切换到生产模式
 	gin.SetMode(gin.ReleaseMode)
 	// 禁用 gin 输出接口访问日志
 	gin.DefaultWriter = ioutil.Discard
 
-	engine := gin.New()
-
-	return engine
 }

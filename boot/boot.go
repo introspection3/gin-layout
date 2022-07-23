@@ -3,6 +3,7 @@ package boot
 import (
 	"flag"
 	"fmt"
+
 	"github.com/wannanbigpig/gin-layout/config"
 	"github.com/wannanbigpig/gin-layout/data"
 	"github.com/wannanbigpig/gin-layout/internal/pkg/logger"

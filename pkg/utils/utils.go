@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -35,6 +36,7 @@ func GetFileDirectoryToCaller(opts ...int) (directory string, ok bool) {
 		skip = opts[0]
 	}
 	if _, filename, _, ok = runtime.Caller(skip); ok {
+		fmt.Println("filename", filename)
 		directory = path.Dir(filename)
 	}
 	return
@@ -53,6 +55,7 @@ func GetCurrentAbPathByExecutable() (string, error) {
 // GetCurrentPath 获取当前执行文件路径
 func GetCurrentPath() (dir string, err error) {
 	dir, err = GetCurrentAbPathByExecutable()
+	fmt.Println("GetCurrentAbPathByExecutable", dir)
 	if err != nil {
 		return "", err
 	}
@@ -61,7 +64,14 @@ func GetCurrentPath() (dir string, err error) {
 	if err != nil {
 		return "", err
 	}
-
+	fmt.Println("tmpDir", tmpDir)
+	v0, _ := GetFileDirectoryToCaller(0)
+	fmt.Println("v0", v0)
+	v1, _ := GetFileDirectoryToCaller(1)
+	fmt.Println("v1", v1)
+	v2, _ := GetFileDirectoryToCaller(2)
+	fmt.Println("v2", v2)
+	//go run 模式下的情况
 	if strings.Contains(dir, tmpDir) {
 		var ok bool
 		if dir, ok = GetFileDirectoryToCaller(2); !ok {

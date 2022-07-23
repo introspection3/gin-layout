@@ -1,15 +1,17 @@
 package config
 
 import (
-	. "github.com/wannanbigpig/gin-layout/config/autoload"
-	"github.com/wannanbigpig/gin-layout/pkg/utils"
-	"gopkg.in/ini.v1"
-	"gopkg.in/yaml.v3"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
+
+	. "github.com/wannanbigpig/gin-layout/config/autoload"
+	"github.com/wannanbigpig/gin-layout/pkg/utils"
+	"gopkg.in/ini.v1"
+	"gopkg.in/yaml.v3"
 )
 
 // Conf 配置项主结构体
@@ -44,9 +46,10 @@ func loadYaml(configPath string) {
 	var yamlConfig string
 	if configPath == "" {
 		runDirectory, _ := utils.GetCurrentPath()
+		fmt.Println("-----------------", runDirectory)
 		// 生成 config.yaml 文件
-		yamlConfig = filepath.Join(runDirectory, "/config.yaml")
-		yamlExampleConfig := filepath.Join(runDirectory, "/config.yaml.example")
+		yamlConfig = filepath.Join(runDirectory, "config", "config.yaml")
+		yamlExampleConfig := filepath.Join(runDirectory, "config", "/config.yaml.example")
 		copyConf(yamlExampleConfig, yamlConfig)
 	} else {
 		yamlConfig = configPath
@@ -68,8 +71,8 @@ func loadIni(configPath string) {
 	if configPath == "" {
 		runDirectory, _ := utils.GetCurrentPath()
 		// 生成 config.ini 文件
-		iniConfig = filepath.Join(runDirectory, "/config.ini")
-		iniExampleConfig := filepath.Join(runDirectory, "/config.ini.example")
+		iniConfig = filepath.Join(runDirectory, "config", "config.ini")
+		iniExampleConfig := filepath.Join(runDirectory, "config", "config.ini.example")
 		copyConf(iniExampleConfig, iniConfig)
 	} else {
 		iniConfig = configPath

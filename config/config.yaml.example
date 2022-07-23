@@ -6,14 +6,14 @@ app:
 #  base_path: ""
 server:
   host: 127.0.0.1
-  port: 9999
+  port: 8000
 mysql:
-  enable: false
+  enable: true
   host: 127.0.0.1
   port: 3306
   database: test
   username: root
-  password: root1234
+  password: root
   charset: utf8mb4
   table_prefix: ""
   max_idle_conns: 10
