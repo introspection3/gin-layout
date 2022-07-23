@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -9,6 +8,9 @@ import (
 	"runtime"
 	"strings"
 )
+
+// UtilsDir 此文件相对于根路径,所在的文件夹
+const UtilsDir = "pkg/utils"
 
 // If 模拟简单的三元操作
 func If(condition bool, trueVal, falseVal any) any {
@@ -55,7 +57,7 @@ func GetCurrentAbPathByExecutable() (string, error) {
 // GetCurrentPath 获取当前执行文件路径
 func GetCurrentPath() (dir string, err error) {
 	dir, err = GetCurrentAbPathByExecutable()
-	fmt.Println("GetCurrentAbPathByExecutable", dir)
+
 	if err != nil {
 		return "", err
 	}
@@ -64,19 +66,16 @@ func GetCurrentPath() (dir string, err error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("tmpDir", tmpDir)
-	v0, _ := GetFileDirectoryToCaller(0)
-	fmt.Println("v0", v0)
-	v1, _ := GetFileDirectoryToCaller(1)
-	fmt.Println("v1", v1)
-	v2, _ := GetFileDirectoryToCaller(2)
-	fmt.Println("v2", v2)
+
 	//go run 模式下的情况
 	if strings.Contains(dir, tmpDir) {
-		var ok bool
-		if dir, ok = GetFileDirectoryToCaller(2); !ok {
-			return "", errors.New("failed to get path")
+		_, filename, _, ok := runtime.Caller(0)
+		if ok {
+			dir = path.Dir(filename)
 		}
+
+		dir = strings.Replace(dir, UtilsDir, "", 1)
+		fmt.Println("dir", dir)
 	}
 	return dir, nil
 }

@@ -1,23 +1,22 @@
 package response
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wannanbigpig/gin-layout/config"
 	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
-	"net/http"
-	"time"
 )
 
 func Resp() *Response {
 	// 初始化response
 	return &Response{
-		httpCode: http.StatusOK,
-		result: &result{
-			Code:    0,
-			Message: "",
-			Data:    nil,
-			Cost:    "",
-		},
+		HttpCode: http.StatusOK,
+		ErrCode:  0,
+		Message:  "",
+		Data:     nil,
+		Cost:     "",
 	}
 }
 
@@ -27,7 +26,10 @@ func Success(c *gin.Context, data ...any) {
 		Resp().WithDataSuccess(c, data[0])
 		return
 	}
-	Resp().Success(c)
+	r := Resp()
+	r.SetErrCode(error_code.SUCCESS)
+	r.Ok = true
+	r.Json(c)
 }
 
 // Fail 业务失败响应
@@ -39,76 +41,61 @@ func Fail(c *gin.Context, code int, data ...any) {
 	Resp().FailCode(c, code)
 }
 
-type result struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-	Cost    string      `json:"cost"`
-}
-
 type Response struct {
-	httpCode int
-	result   *result
+	HttpCode int    `json:"httpCode"`
+	Ok       bool   `json:"ok"`
+	ErrCode  int    `json:"errCode"`
+	Message  string `json:"message"`
+	Data     any    `json:"data"`
+	Cost     string `json:"cost"`
 }
 
 // Fail 错误返回
 func (r *Response) Fail(c *gin.Context) {
-	r.SetCode(error_code.FAILURE)
-	r.json(c)
+	r.SetErrCode(error_code.FAILURE)
+	r.Json(c)
 }
 
 // FailCode 自定义错误码返回
 func (r *Response) FailCode(c *gin.Context, code int, msg ...string) {
-	r.SetCode(code)
+	r.SetErrCode(code)
+	r.Ok = false
 	if msg != nil {
 		r.WithMessage(msg[0])
 	}
-	r.json(c)
-}
-
-// Success 正确返回
-func (r *Response) Success(c *gin.Context) {
-	r.SetCode(error_code.SUCCESS)
-	r.json(c)
+	r.Json(c)
 }
 
 // WithDataSuccess 成功后需要返回值
 func (r *Response) WithDataSuccess(c *gin.Context, data interface{}) {
-	r.SetCode(error_code.SUCCESS)
+	r.SetErrCode(error_code.SUCCESS)
+	r.Ok = true
 	r.WithData(data)
-	r.json(c)
+	r.Json(c)
 }
 
-// SetCode 设置返回code码
-func (r *Response) SetCode(code int) *Response {
-	r.result.Code = code
+// SetErrCode 设置返回code码
+func (r *Response) SetErrCode(code int) *Response {
+	r.ErrCode = code
+	r.Ok = code == 1
 	return r
 }
 
 // SetHttpCode 设置http状态码
 func (r *Response) SetHttpCode(code int) *Response {
-	r.httpCode = code
+	r.HttpCode = code
 	return r
-}
-
-type defaultRes struct {
-	Result any `json:"result"`
 }
 
 // WithData 设置返回data数据
 func (r *Response) WithData(data interface{}) *Response {
-	switch data.(type) {
-	case string, int, bool:
-		r.result.Data = &defaultRes{Result: data}
-	default:
-		r.result.Data = data
-	}
+	r.Data = data
 	return r
 }
 
 // WithMessage 设置返回自定义错误消息
 func (r *Response) WithMessage(message string) *Response {
-	r.result.Message = message
+	r.Message = message
 	return r
 }
 
@@ -116,16 +103,12 @@ var errorText = &error_code.ErrorText{
 	Language: config.Config.Language,
 }
 
-// json 返回 gin 框架的 HandlerFunc
-func (r *Response) json(c *gin.Context) {
-	if r.result.Message == "" {
-		r.result.Message = errorText.Text(r.result.Code)
+// Json 返回 gin 框架的 HandlerFunc
+func (r *Response) Json(c *gin.Context) {
+	if r.Message == "" {
+		r.Message = errorText.Text(r.ErrCode)
 	}
 
-	// if r.Data == nil {
-	// 	r.Data = struct{}{}
-	// }
-
-	r.result.Cost = time.Since(c.GetTime("requestStartTime")).String()
-	c.AbortWithStatusJSON(r.httpCode, r.result)
+	r.Cost = time.Since(c.GetTime("requestStartTime")).String()
+	c.JSON(200, *r)
 }
