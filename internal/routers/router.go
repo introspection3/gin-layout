@@ -10,13 +10,13 @@ import (
 	"github.com/wannanbigpig/gin-layout/config"
 	"github.com/wannanbigpig/gin-layout/internal/error_code"
 	"github.com/wannanbigpig/gin-layout/internal/middleware"
-	response2 "github.com/wannanbigpig/gin-layout/internal/response"
+	"github.com/wannanbigpig/gin-layout/internal/response"
 )
 
 func SetRouters() *gin.Engine {
-	r := gin.New()
-	r.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
-	r.StaticFS("assets", http.FS(assets.Static))
+	eng := gin.New()
+	eng.SetHTMLTemplate(template.Must(template.New("").ParseFS(assets.Templates, "templates/**/*")))
+	eng.StaticFS("assets", http.FS(assets.Static))
 	fav := func(c *gin.Context) {
 		if c.Request.RequestURI != "/favicon.ico" {
 			return
@@ -39,44 +39,44 @@ func SetRouters() *gin.Engine {
 
 	}
 	// 初始化默认静态资源
-	r.Use(fav)
+	eng.Use(fav)
 
 	// 设置模板资源
 
-	r.Use(
+	eng.Use(
 		middleware.RequestCostHandler(),
 		middleware.CustomRecovery(),
 		middleware.CorsHandler(),
 	)
 
-	if config.Config.Debug == false {
+	if !config.Config.Debug {
 		// 生产模式
 		ReleaseRouter()
-		r.Use(
+		eng.Use(
 			middleware.CustomLogger(),
 		)
 	} else {
 		// 开发调试模式
-		r.Use(
+		eng.Use(
 			gin.Logger(),
 		)
 	}
 
 	// ping
-	r.GET("/ping", func(c *gin.Context) {
+	eng.GET("/ping", func(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{
 			"message": "pong!",
 		})
 	})
 
 	// 设置 API 路由
-	setApiRoute(r)
+	setApiRoute(eng)
 
-	r.NoRoute(func(c *gin.Context) {
-		response2.Resp().SetHttpCode(http.StatusNotFound).FailCode(c, error_code.NotFound)
+	eng.NoRoute(func(c *gin.Context) {
+		response.FailHttpStatus(c, error_code.NotFound, http.StatusNotFound, "")
 	})
 
-	return r
+	return eng
 }
 
 // ReleaseRouter 生产模式使用官方建议设置为 release 模式
@@ -85,5 +85,4 @@ func ReleaseRouter() {
 	gin.SetMode(gin.ReleaseMode)
 	// 禁用 gin 输出接口访问日志
 	gin.DefaultWriter = ioutil.Discard
-
 }

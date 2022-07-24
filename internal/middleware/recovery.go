@@ -3,13 +3,12 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wannanbigpig/gin-layout/config"
 	"github.com/wannanbigpig/gin-layout/internal/error_code"
-	response2 "github.com/wannanbigpig/gin-layout/internal/response"
+	r "github.com/wannanbigpig/gin-layout/internal/response"
 	"github.com/wannanbigpig/gin-layout/pkg/logger"
 )
 
@@ -23,7 +22,7 @@ func CustomRecovery() gin.HandlerFunc {
 		if config.Config.Debug {
 			errStr = fmt.Sprintf("%v", err)
 		}
-		response2.Resp().SetHttpCode(http.StatusInternalServerError).FailCode(c, error_code.ServerError, errStr)
+		r.Fail(c, error_code.ServerError, errStr)
 	})
 }
 

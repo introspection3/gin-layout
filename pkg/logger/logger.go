@@ -2,6 +2,7 @@ package logger
 
 import (
 	"io"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
@@ -30,6 +31,7 @@ func createZapLog() *zap.Logger {
 	// 开启 debug
 	if config.Config.Debug {
 		if Logger, err := zap.NewDevelopment(); err == nil {
+
 			return Logger
 		} else {
 			panic("create zap log err：" + err.Error())
@@ -53,8 +55,9 @@ func createZapLog() *zap.Logger {
 		// 按天切割日志
 		writer = zapcore.AddSync(getRotateWriter(filename))
 	}
-
-	zapCore := zapcore.NewCore(encoder, writer, zap.InfoLevel)
+	multi := zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout),
+		writer)
+	zapCore := zapcore.NewCore(encoder, multi, zap.InfoLevel)
 	//zap.AddStacktrace(zap.WarnLevel)
 	return zap.New(zapCore, zap.AddCaller())
 }

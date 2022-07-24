@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -62,17 +61,14 @@ func Run() {
 	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	logger.Logger.Info("Shutdown Server ...")
+	logger.Logger.Warn("shutdown server,please wait 5s ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
-		logger.Logger.Warn("Server Shutdown:" + err.Error())
+		logger.Logger.Warn("server shutdown:" + err.Error())
 	}
 	// catching ctx.Done(). timeout of 5 seconds.
-	select {
-	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
-	}
-	logger.Logger.Info("Server exiting")
+	<-ctx.Done()
+	logger.Logger.Warn("Server exiting")
 }

@@ -20,10 +20,8 @@ func (et *ErrorText) Text(code int) (str string) {
 	switch et.Language {
 	case "zh_CN":
 		str, ok = zhCNText[code]
-		break
 	case "en":
 		str, ok = enUSText[code]
-		break
 	}
 	if !ok {
 		return "unknown error"

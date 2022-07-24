@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/example/helloworld": {
+        "/helloworld": {
             "get": {
                 "description": "do ping",
                 "consumes": [

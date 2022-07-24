@@ -14,7 +14,7 @@ func setApiRoute(r *gin.Engine) {
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/login", c.Login)
-		v1.GET("/hello-world", c.HelloWorld)
+		v1.GET("/helloworld", c.HelloWorld)
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }
