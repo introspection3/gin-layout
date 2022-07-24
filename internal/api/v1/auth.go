@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	r "github.com/wannanbigpig/gin-layout/internal/pkg/response"
+	r "github.com/wannanbigpig/gin-layout/internal/response"
 	"github.com/wannanbigpig/gin-layout/internal/service"
 	"github.com/wannanbigpig/gin-layout/internal/validator"
 	"github.com/wannanbigpig/gin-layout/internal/validator/form"

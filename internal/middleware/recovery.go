@@ -3,13 +3,14 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/wannanbigpig/gin-layout/config"
-	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
-	"github.com/wannanbigpig/gin-layout/internal/pkg/logger"
-	response2 "github.com/wannanbigpig/gin-layout/internal/pkg/response"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/wannanbigpig/gin-layout/config"
+	"github.com/wannanbigpig/gin-layout/internal/error_code"
+	response2 "github.com/wannanbigpig/gin-layout/internal/response"
+	"github.com/wannanbigpig/gin-layout/pkg/logger"
 )
 
 // CustomRecovery 自定义错误 (panic) 拦截中间件、对可能发生的错误进行拦截、统一记录
@@ -19,7 +20,7 @@ func CustomRecovery() gin.HandlerFunc {
 		// 这里针对发生的panic等异常进行统一响应即
 		// 这里针对发生的panic等异常进行统一响应即
 		errStr := ""
-		if config.Config.Debug == true {
+		if config.Config.Debug {
 			errStr = fmt.Sprintf("%v", err)
 		}
 		response2.Resp().SetHttpCode(http.StatusInternalServerError).FailCode(c, error_code.ServerError, errStr)

@@ -1,6 +1,10 @@
 package validator
 
 import (
+	"reflect"
+	"strings"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
@@ -9,11 +13,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	enTranslations "github.com/go-playground/validator/v10/translations/en"
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
-	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
-	r "github.com/wannanbigpig/gin-layout/internal/pkg/response"
-	"reflect"
-	"strings"
-	"sync"
+	"github.com/wannanbigpig/gin-layout/internal/error_code"
+	r "github.com/wannanbigpig/gin-layout/internal/response"
 )
 
 type Page struct {

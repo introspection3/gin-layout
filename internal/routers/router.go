@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wannanbigpig/gin-layout/assets"
 	"github.com/wannanbigpig/gin-layout/config"
+	"github.com/wannanbigpig/gin-layout/internal/error_code"
 	"github.com/wannanbigpig/gin-layout/internal/middleware"
-	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
-	response2 "github.com/wannanbigpig/gin-layout/internal/pkg/response"
+	response2 "github.com/wannanbigpig/gin-layout/internal/response"
 )
 
 func SetRouters() *gin.Engine {

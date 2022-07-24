@@ -1,32 +1,38 @@
 package logger
 
 import (
+	"io"
+	"path/filepath"
+	"sync"
+	"time"
+
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/natefinch/lumberjack"
 	"github.com/wannanbigpig/gin-layout/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"io"
-	"path/filepath"
-	"sync"
-	"time"
 )
 
 var Logger *zap.Logger
 var once sync.Once
 
+var SLogger *zap.SugaredLogger
+
 func InitLogger() {
-	once.Do(func() { Logger = createZapLog() })
+	once.Do(func() {
+		Logger = createZapLog()
+		SLogger = Logger.Sugar()
+	})
 }
 
 // initZapLog 初始化 zap 日志
 func createZapLog() *zap.Logger {
 	// 开启 debug
-	if config.Config.Debug == true {
+	if config.Config.Debug {
 		if Logger, err := zap.NewDevelopment(); err == nil {
 			return Logger
 		} else {
-			panic("创建zap日志包失败，详情：" + err.Error())
+			panic("create zap log err：" + err.Error())
 		}
 	}
 
@@ -38,7 +44,7 @@ func createZapLog() *zap.Logger {
 	// 在日志文件中使用大写字母记录日志级别
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoder := zapcore.NewConsoleEncoder(encoderConfig)
-	filename := filepath.Join(config.Config.StaticBasePath, "/logs/", config.Config.Logger.Filename)
+	filename := filepath.Join(config.Config.StaticBasePath, "logs", config.Config.Logger.Filename)
 	var writer zapcore.WriteSyncer
 	if config.Config.Logger.DefaultDivision == "size" {
 		// 按文件大小切割日志

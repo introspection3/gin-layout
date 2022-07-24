@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/wannanbigpig/gin-layout/config"
-	"github.com/wannanbigpig/gin-layout/internal/pkg/error_code"
+	"github.com/wannanbigpig/gin-layout/internal/error_code"
 )
 
 func Resp() *Response {

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/wannanbigpig/gin-layout/internal/pkg/utils"
+	"github.com/wannanbigpig/gin-layout/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/plugin/soft_delete"
 )

@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"bytes"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wannanbigpig/gin-layout/config"
-	log "github.com/wannanbigpig/gin-layout/internal/pkg/logger"
+	log "github.com/wannanbigpig/gin-layout/pkg/logger"
 	"go.uber.org/zap"
-	"time"
 )
 
 type responseWriter struct {

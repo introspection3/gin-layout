@@ -2,8 +2,9 @@ package data
 
 import (
 	"fmt"
+
 	c "github.com/wannanbigpig/gin-layout/config"
-	log "github.com/wannanbigpig/gin-layout/internal/pkg/logger"
+	log "github.com/wannanbigpig/gin-layout/pkg/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
